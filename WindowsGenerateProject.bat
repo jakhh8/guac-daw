@@ -1,3 +1,4 @@
+mkdir guac-daw/vendor/openal-soft/build
 cd guac-daw/vendor/openal-soft/build
 cmake ..
 make
