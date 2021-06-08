@@ -15,13 +15,13 @@ ifeq ($(config),debug)
   ImGui_config = debug
   yaml_cpp_config = debug
   Guacamole_config = debug
-  SoundApp_config = debug
+  guac_daw_config = debug
 
 else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := Premake GLFW Glad ImGui yaml-cpp Guacamole SoundApp
+PROJECTS := Premake GLFW Glad ImGui yaml-cpp Guacamole guac-daw
 
 .PHONY: all clean help $(PROJECTS) Dependencies
 
@@ -65,10 +65,10 @@ ifneq (,$(Guacamole_config))
 	@${MAKE} --no-print-directory -C Guacamole -f Makefile config=$(Guacamole_config)
 endif
 
-SoundApp: Guacamole GLFW Glad ImGui yaml-cpp
-ifneq (,$(SoundApp_config))
-	@echo "==== Building SoundApp ($(SoundApp_config)) ===="
-	@${MAKE} --no-print-directory -C SoundApp -f Makefile config=$(SoundApp_config)
+guac-daw: Guacamole GLFW Glad ImGui yaml-cpp
+ifneq (,$(guac_daw_config))
+	@echo "==== Building guac-daw ($(guac_daw_config)) ===="
+	@${MAKE} --no-print-directory -C guac-daw -f Makefile config=$(guac_daw_config)
 endif
 
 clean:
@@ -78,7 +78,7 @@ clean:
 	@${MAKE} --no-print-directory -C Guacamole/vendor/imgui -f Makefile clean
 	@${MAKE} --no-print-directory -C Guacamole/vendor/yaml-cpp -f Makefile clean
 	@${MAKE} --no-print-directory -C Guacamole -f Makefile clean
-	@${MAKE} --no-print-directory -C SoundApp -f Makefile clean
+	@${MAKE} --no-print-directory -C guac-daw -f Makefile clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -95,6 +95,6 @@ help:
 	@echo "   ImGui"
 	@echo "   yaml-cpp"
 	@echo "   Guacamole"
-	@echo "   SoundApp"
+	@echo "   guac-daw"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

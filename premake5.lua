@@ -1,8 +1,8 @@
 include "./vendor/premake/premake_customization/solution_items.lua"
 
-workspace "Sound"
+workspace "daw"
 	architecture "x64"
-	startproject "SoundApp"
+	startproject "guac-daw"
 
 	configurations
 	{
@@ -41,4 +41,4 @@ group "Dependencies"
 group ""
 
 include "Guacamole"
-include "SoundApp"
+include "guac-daw"

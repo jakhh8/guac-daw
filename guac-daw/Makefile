@@ -19,11 +19,11 @@ endif
 # #############################################
 
 RESCOMP = windres
-TARGETDIR = ../bin/Debug-linux-x86_64/SoundApp
-TARGET = $(TARGETDIR)/SoundApp
-OBJDIR = ../bin-int/Debug-linux-x86_64/SoundApp
+TARGETDIR = ../bin/Debug-linux-x86_64/guac-daw
+TARGET = $(TARGETDIR)/guac-daw
+OBJDIR = ../bin-int/Debug-linux-x86_64/guac-daw
 DEFINES += -DGM_DEBUG
-INCLUDES += -ISoundApp/src -I../Guacamole/vendor/spdlog/include -I../Guacamole/src -I../Guacamole/vendor -I../Guacamole/vendor/imgui -I../Guacamole/vendor/glm -I../Guacamole/vendor/EnTT -I../Guacamole/vendor/yaml-cpp/include -I../Guacamole/vendor/ImGuizmo -Ivendor/openal-soft/include/AL -Ivendor/openal-soft/common
+INCLUDES += -Iguac-daw/src -I../Guacamole/vendor/spdlog/include -I../Guacamole/src -I../Guacamole/vendor -I../Guacamole/vendor/imgui -I../Guacamole/vendor/glm -I../Guacamole/vendor/EnTT -I../Guacamole/vendor/yaml-cpp/include -I../Guacamole/vendor/ImGuizmo -I../SoundApp/vendor/openal-soft/include/AL -Ivendor/openal-soft/common
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -m64 -g
@@ -67,7 +67,7 @@ all: $(TARGET)
 
 $(TARGET): $(GENERATED) $(OBJECTS) $(LDDEPS) | $(TARGETDIR)
 	$(PRELINKCMDS)
-	@echo Linking SoundApp
+	@echo Linking guac-daw
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -88,7 +88,7 @@ else
 endif
 
 clean:
-	@echo Cleaning SoundApp
+	@echo Cleaning guac-daw
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(GENERATED)

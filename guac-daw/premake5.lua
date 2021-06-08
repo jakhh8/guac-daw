@@ -1,4 +1,4 @@
-project "SoundApp"
+project "guac-daw"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
@@ -15,7 +15,7 @@ project "SoundApp"
     
 	includedirs
 	{
-		"SoundApp/src",
+		"guac-daw/src",
         
 		"%{wks.location}/Guacamole/vendor/spdlog/include",
 		"%{wks.location}/Guacamole/src",
@@ -26,7 +26,7 @@ project "SoundApp"
         "%{IncludeDir.yaml_cpp}",
         "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.OpenAL}",
-        "%{wks.location}/SoundApp/vendor/openal-soft/common"
+        "%{wks.location}/guac-daw/vendor/openal-soft/common"
 	}
 	
 	links

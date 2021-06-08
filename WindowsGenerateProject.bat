@@ -1,4 +1,4 @@
-cd SoundApp/vendor/openal-soft/build
+cd guac-daw/vendor/openal-soft/build
 cmake ..
 make
 cd ../../../../
