@@ -1,0 +1,6 @@
+# Makefile generator clutter
+Makefile
+
+# Build dirs
+bin
+bin-int

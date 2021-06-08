@@ -1,0 +1,17 @@
+# Binaries
+**/bin/
+!vendor/premake/bin/
+**/bin-int/
+
+# Profiler files
+SoundApp/GuacamoleProfile-Runtime.json
+SoundApp/GuacamoleProfile-Shutdown.json
+SoundApp/GuacamoleProfile-Startup.json
+
+# Visual Studio files and folder
+.vs/
+**.sln
+**.vcxproj
+**.vcxproj.filters
+**.vcxproj.user
+.vscode/
