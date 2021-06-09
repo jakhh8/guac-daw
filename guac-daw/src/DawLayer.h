@@ -6,11 +6,11 @@
 
 namespace Guacamole {
 
-	class EditorLayer : public Layer
+	class DawLayer : public Layer
 	{
 	public:
-		EditorLayer();
-		virtual ~EditorLayer() = default;
+		DawLayer();
+		virtual ~DawLayer() = default;
 
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;

@@ -11,7 +11,6 @@
 
 #include <thread>
 #include <atomic>
-#include <vector>
 
 #include <fstream>
 
@@ -130,7 +129,6 @@ public:
 		{
 			ALint processed;
 			alGetSourcei(source[0], AL_BUFFERS_PROCESSED, &processed);
-			GM_INFO("Buffers processed: {0}", processed);
 
 			// Play something
 			for(unsigned int i = 0; i < BUF_SIZE; ++i)

@@ -1,4 +1,4 @@
-#include "EditorLayer.h"
+#include "DawLayer.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -11,6 +11,8 @@
 
 #include <Guacamole/Math/Math.h>
 
+#include <vector>
+
 #define OSC_SINE 0
 #define OSC_SQUARE 1
 #define OSC_TRIANGLE 2
@@ -20,44 +22,47 @@
 
 namespace Guacamole {
 
-	EditorLayer::EditorLayer()
-		: Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
+	DawLayer::DawLayer()
+		: Layer("Daw"), m_CameraController(1280.0f / 720.0f)
 	{
 	}
 
+	double octaveBaseFrequency = 220.0; // A2
+	double The12thRootOf2 = pow(2.0, 1.0 / 12.0);
+
 	struct EnvelopeADSR
 	{
-		float AttackTime;
-		float DecayTime;
-		float ReleaseTime;
+		double AttackTime;
+		double DecayTime;
+		double ReleaseTime;
 
-		float SustainAmplitude;
-		float StartAmplitude;
+		double SustainAmplitude;
+		double StartAmplitude;
 
-		float TriggerOnTime;
-		float TriggerOffTime;
+		double TriggerOnTime;
+		double TriggerOffTime;
 
 		bool IsNoteOn;
 
 		EnvelopeADSR()
 		{
-			AttackTime = 0.1f;
-			DecayTime = 0.01f;
-			ReleaseTime = 0.2f;
+			AttackTime = 0.1;
+			DecayTime = 0.01;
+			ReleaseTime = 0.2;
 
-			SustainAmplitude = 0.8f;
-			StartAmplitude = 1.0f;
+			SustainAmplitude = 0.8;
+			StartAmplitude = 1.0;
 
-			TriggerOnTime = 0.0f;
-			TriggerOffTime = 0.0f;
+			TriggerOnTime = 0.0;
+			TriggerOffTime = 0.0;
 
 			IsNoteOn = false;
 		}
 
-		float GetAmplitude(float time)
+		double GetAmplitude(double time)
 		{
-			float amplitude = 0.0f;
-			float lifetime = time - TriggerOnTime;
+			double amplitude = 0.0;
+			double lifetime = time - TriggerOnTime;
 
 			if(IsNoteOn)
 			{
@@ -85,24 +90,23 @@ namespace Guacamole {
 			return amplitude;
 		}
 
-		void NoteOn(float noteOnTime)
+		void NoteOn(double noteOnTime)
 		{
 			TriggerOnTime = noteOnTime;
 			IsNoteOn = true;
 		}
 
-		void NoteOff(float noteOffTime)
+		void NoteOff(double noteOffTime)
 		{
 			TriggerOffTime = noteOffTime;
 			IsNoteOn = false;
 		}
 	};
 
-	double octaveBaseFrequency = 110.0; // A2
-	double The12thRootOf2 = pow(2.0, 1.0 / 12.0);
-
-	NoiseMaker noiseMaker;
-	EnvelopeADSR envelopes[16];
+	struct NoteADSR : public EnvelopeADSR
+	{
+		int Note = 0;
+	};
 
 	double calcFrequency(int i)
 	{
@@ -145,21 +149,139 @@ namespace Guacamole {
 		}
 	}
 
-	double MakeNoise(double time)
+	struct Instrument
 	{
-		double noise = 0.0;
-		
-		for(int i = 0; i < 16; i++)
+		double Volume;
+		std::vector<NoteADSR> Notes;
+
+		virtual double Sound(double time) = 0;
+	};
+
+	struct Bell : public Instrument
+	{
+		Bell()
 		{
-			if(envelopes[i].GetAmplitude(time) != 0.0)
-				noise += envelopes[i].GetAmplitude(time) * (osc(calcFrequency(i) * 0.5, time, OSC_SINE) + osc(calcFrequency(i), time, OSC_SAW_ANA));
+			for(int i = 0; i < 16; i++)
+			{
+				NoteADSR note;
+				
+				note.AttackTime = 0.01;
+				note.DecayTime = 1.0;
+				note.SustainAmplitude = 0.0;
+				note.ReleaseTime = 1.0;
+
+				note.Note = i;
+
+				Notes.push_back(note);
+			}
+
+			Volume = 1.0;
 		}
 
+		virtual double Sound(double time) override
+		{
+			double output = 0.0;
+
+			for(auto note : Notes)
+			{
+				output += note.GetAmplitude(time) *
+				(
+					  1.0 * osc(calcFrequency(note.Note), time, OSC_SINE, 5.0, 0.001)
+					+ 0.5 * osc(calcFrequency(note.Note) * 2.0, time, OSC_SINE)
+					+ 0.25 * osc(calcFrequency(note.Note) * 3.0, time, OSC_SINE)
+				);
+			}
+
+			return output * Volume;
+		}
+	};
+
+	struct Harmonica : public Instrument
+	{
+		Harmonica()
+		{
+			for(int i = 0; i < 16; i++)
+			{
+				NoteADSR note;
+				
+				note.AttackTime = 0.05;
+				note.DecayTime = 1.0;
+				note.SustainAmplitude = 0.95;
+				note.ReleaseTime = 0.1;
+
+				note.Note = i;
+
+				Notes.push_back(note);
+			}
+
+			Volume = 1.0;
+		}
+
+		virtual double Sound(double time) override
+		{
+			double output = 0.0;
+			
+			for(auto note : Notes)
+			{
+				output += note.GetAmplitude(time) *
+				(
+					  1.0 * osc(calcFrequency(note.Note), time, OSC_SQUARE, 5.0, 0.001)
+					+ 0.5 * osc(calcFrequency(note.Note) * 1.5, time, OSC_SQUARE)
+					+ 0.25 * osc(calcFrequency(note.Note) * 2.0, time, OSC_SQUARE)
+					+ 0.05 * osc(0, time, OSC_NOISE)
+				);
+			}
+
+			return output * Volume;
+		}
+	};
+
+	struct Piano : public Instrument
+	{
+		Piano()
+		{
+			for(int i = 0; i < 16; i++)
+			{
+				NoteADSR note;
+				
+				note.AttackTime = 0.05;
+				note.SustainAmplitude = 0.95;
+
+				note.Note = i;
+
+				Notes.push_back(note);
+			}
+
+			Volume = 1.0;
+		}
+
+		virtual double Sound(double time) override
+		{
+			double output = 0.0;
+			
+			for(auto note : Notes)
+			{
+				output += note.GetAmplitude(time) *
+				(
+					  1.0 * osc(calcFrequency(note.Note) * 0.5, time, OSC_SINE)
+					+ 0.5 * osc(calcFrequency(note.Note), time, OSC_SAW_ANA)
+				);
+			}
+
+			return output * Volume;
+		}
+	};
+
+	NoiseMaker noiseMaker;
+	Instrument* instrument = new Harmonica();
+
+	double MakeNoise(double time)
+	{
 		// Master volume
-		return noise * 0.1;
+		return instrument->Sound(time) * 0.1;
 	}
 
-	void EditorLayer::OnAttach()
+	void DawLayer::OnAttach()
 	{
 		GM_PROFILE_FUNCTION();
 		
@@ -232,14 +354,14 @@ namespace Guacamole {
 		
 	}
 
-	void EditorLayer::OnDetach()
+	void DawLayer::OnDetach()
 	{
 		GM_PROFILE_FUNCTION();
 
 		noiseMaker.Stop();
 	}
 
-	void EditorLayer::OnUpdate(Timestep ts)
+	void DawLayer::OnUpdate(Timestep ts)
 	{
 		GM_PROFILE_FUNCTION();
 
@@ -265,10 +387,10 @@ namespace Guacamole {
 		
 		for(int i = 0; i < 16; i++)
 		{
-			if(Input::IsKeyPressed(keys[i]) && !envelopes[i].IsNoteOn)
-				envelopes[i].NoteOn(noiseMaker.GetTime());
-			else if(!Input::IsKeyPressed(keys[i]) && envelopes[i].IsNoteOn)
-				envelopes[i].NoteOff(noiseMaker.GetTime());
+			if(Input::IsKeyPressed(keys[i]) && !instrument->Notes.at(i).IsNoteOn)
+				instrument->Notes.at(i).NoteOn(noiseMaker.GetTime());
+			else if(!Input::IsKeyPressed(keys[i]) && instrument->Notes.at(i).IsNoteOn)
+				instrument->Notes.at(i).NoteOff(noiseMaker.GetTime());
 		}
 		
 		// Render
@@ -302,7 +424,7 @@ namespace Guacamole {
 		m_Framebuffer->Unbind();
 	}
 
-	void EditorLayer::OnImGuiRender()
+	void DawLayer::OnImGuiRender()
 	{
 		GM_PROFILE_FUNCTION();
 
@@ -463,17 +585,17 @@ namespace Guacamole {
 		ImGui::End();
 	}
 
-	void EditorLayer::OnEvent(Event& e)
+	void DawLayer::OnEvent(Event& e)
 	{
 		m_CameraController.OnEvent(e);
 		m_EditorCamera.OnEvent(e);
 
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<KeyPressedEvent>(GM_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
-		dispatcher.Dispatch<MouseButtonPressedEvent>(GM_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+		dispatcher.Dispatch<KeyPressedEvent>(GM_BIND_EVENT_FN(DawLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(GM_BIND_EVENT_FN(DawLayer::OnMouseButtonPressed));
 	}
 	
-	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) 
+	bool DawLayer::OnKeyPressed(KeyPressedEvent& e) 
 	{
 		if(e.GetRepeatCount() > 0)
 			return false;
@@ -481,7 +603,7 @@ namespace Guacamole {
 		return true;
 	}
 	
-	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) 
+	bool DawLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) 
 	{
 		if(e.GetMouseButton() == Mouse::ButtonLeft)
 		{
@@ -492,7 +614,7 @@ namespace Guacamole {
 		return false;
 	}
 	
-	void EditorLayer::NewScene() 
+	void DawLayer::NewScene() 
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
@@ -500,7 +622,7 @@ namespace Guacamole {
 		m_CurrentFile = "";
 	}
 	
-	void EditorLayer::OpenScene() 
+	void DawLayer::OpenScene() 
 	{
 		std::optional<std::string> filepath = FileDialogs::OpenFile("Guacamole Scene (*.guac)\0*.guac\0");
 		if(filepath)
@@ -515,7 +637,7 @@ namespace Guacamole {
 		}
 	}
 	
-	void EditorLayer::SaveScene() 
+	void DawLayer::SaveScene() 
 	{
 		if(!m_CurrentFile.empty())
 		{
@@ -524,7 +646,7 @@ namespace Guacamole {
 		}
 	}
 	
-	void EditorLayer::SaveSceneAs() 
+	void DawLayer::SaveSceneAs() 
 	{
 		std::optional<std::string> filepath = FileDialogs::SaveFile("Guacamole Scene (*.guac)\0*.guac\0");
 		if(filepath)

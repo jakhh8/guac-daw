@@ -50,13 +50,13 @@ endef
 GENERATED :=
 OBJECTS :=
 
-GENERATED += $(OBJDIR)/EditorLayer.o
+GENERATED += $(OBJDIR)/DawLayer.o
+GENERATED += $(OBJDIR)/GuacDawApp.o
 GENERATED += $(OBJDIR)/SceneHierarchyPanel.o
-GENERATED += $(OBJDIR)/SoundApp.o
 GENERATED += $(OBJDIR)/main.o
-OBJECTS += $(OBJDIR)/EditorLayer.o
+OBJECTS += $(OBJDIR)/DawLayer.o
+OBJECTS += $(OBJDIR)/GuacDawApp.o
 OBJECTS += $(OBJDIR)/SceneHierarchyPanel.o
-OBJECTS += $(OBJDIR)/SoundApp.o
 OBJECTS += $(OBJDIR)/main.o
 
 # Rules
@@ -121,13 +121,13 @@ endif
 # File Rules
 # #############################################
 
-$(OBJDIR)/EditorLayer.o: src/EditorLayer.cpp
+$(OBJDIR)/DawLayer.o: src/DawLayer.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/GuacDawApp.o: src/GuacDawApp.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/SceneHierarchyPanel.o: src/Panels/SceneHierarchyPanel.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/SoundApp.o: src/SoundApp.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.cpp
