@@ -4,9 +4,7 @@
 **/bin-int/
 
 # Profiler files
-SoundApp/GuacamoleProfile-Runtime.json
-SoundApp/GuacamoleProfile-Shutdown.json
-SoundApp/GuacamoleProfile-Startup.json
+guac-daw/**.json
 
 # Visual Studio files and folder
 .vs/
