@@ -2,7 +2,8 @@
 
 #include <Guacamole.h>
 #include "Panels/SceneHierarchyPanel.h"
-#include "Sound.h"
+#include "SoundAPI.h"
+#include "Synth.h"
 
 namespace Guacamole {
 
@@ -18,6 +19,8 @@ namespace Guacamole {
 		virtual void OnUpdate(Timestep ts) override;
 		virtual void OnImGuiRender() override;
 		virtual void OnEvent(Event& e) override;
+
+		static double MakeNoise(double time);
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
@@ -56,6 +59,10 @@ namespace Guacamole {
 
 		int m_GizmoType = -1;
 		int m_GizmoMode = 0;
+
+		// Audio/Synth
+		SoundAPI::AudioIO m_AudioIO;
+		static Synth::Instrument* s_Instrument;
 
 		// Panels
 		SceneHierarchyPanel m_SceneHierarchyPanel;

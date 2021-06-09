@@ -1,4 +1,4 @@
-/*#include "Sound.h"
+/*#include "SoundAPI.h"
 
 std::atomic<float> freq;
 
@@ -10,7 +10,7 @@ int MakeNoise(float time)
 
 int main()
 {
-	NoiseMaker noiseMaker;
+	AudioIO noiseMaker;
 
 	noiseMaker.SetUserFunc(MakeNoise);
 
