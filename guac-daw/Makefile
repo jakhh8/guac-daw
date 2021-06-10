@@ -52,11 +52,11 @@ OBJECTS :=
 
 GENERATED += $(OBJDIR)/DawLayer.o
 GENERATED += $(OBJDIR)/GuacDawApp.o
-GENERATED += $(OBJDIR)/SceneHierarchyPanel.o
+GENERATED += $(OBJDIR)/SequencerPanel.o
 GENERATED += $(OBJDIR)/main.o
 OBJECTS += $(OBJDIR)/DawLayer.o
 OBJECTS += $(OBJDIR)/GuacDawApp.o
-OBJECTS += $(OBJDIR)/SceneHierarchyPanel.o
+OBJECTS += $(OBJDIR)/SequencerPanel.o
 OBJECTS += $(OBJDIR)/main.o
 
 # Rules
@@ -127,7 +127,7 @@ $(OBJDIR)/DawLayer.o: src/DawLayer.cpp
 $(OBJDIR)/GuacDawApp.o: src/GuacDawApp.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/SceneHierarchyPanel.o: src/Panels/SceneHierarchyPanel.cpp
+$(OBJDIR)/SequencerPanel.o: src/Panels/SequencerPanel.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/main.o: src/main.cpp
